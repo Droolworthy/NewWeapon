@@ -1,35 +1,15 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class Shotgun : Weapon
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] private int _amountOfBullets;
+    [SerializeField] private int _angle;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
-
-    private void Start()
+    public override void Shoot(Transform shootPoint)
     {
-        _animator = GetComponent<Animator>();
-    }
-
-    private void Update()
-    {
-        if(_lastAssaultTime <= 0)
+        for (int i = 0; i < _amountOfBullets; i++)
         {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
+            Instantiate(ShotgunBullet, shootPoint.position, Quaternion.AngleAxis(_angle, Vector3.forward));
         }
-
-        _lastAssaultTime -= Time.deltaTime;  
-    }
-
-    private void Assault(Player target)
-    {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
-    }
+    }  
 }
