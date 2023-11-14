@@ -1,35 +1,22 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class RevolverBullet : MonoBehaviour
 {
     [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
-
-    private float _lastAssaultTime;
-    private Animator _animator;
-
-    private void Start()
-    {
-        _animator = GetComponent<Animator>();
-    }
+    [SerializeField] private float _speed;
 
     private void Update()
     {
-        if(_lastAssaultTime <= 0)
-        {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
-        }
-
-        _lastAssaultTime -= Time.deltaTime;  
+        transform.Translate(Vector2.left * _speed * Time.deltaTime, Space.World);
     }
 
-    private void Assault(Player target)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        _animator.Play("Assault");
+        if (collision.gameObject.TryGetComponent(out Enemy enemy))
+        {
+            enemy.TakeDamage(_damage);
 
-        target.ApplyDamage(_damage);
+            Destroy(gameObject);
+        }
     }
 }
