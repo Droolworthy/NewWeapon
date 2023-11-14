@@ -1,35 +1,48 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class WeaponView : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] private TMP_Text _label;
+    [SerializeField] private TMP_Text _price;
+    [SerializeField] private Image _icon;
+    [SerializeField] private Button _sellButton;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
+    private Weapon _weapon;
 
-    private void Start()
+    public event UnityAction<Weapon, WeaponView> SellButtonClick;
+
+    private void OnEnable()
     {
-        _animator = GetComponent<Animator>();
+        _sellButton.onClick.AddListener(OnButtonClick);
+        _sellButton.onClick.AddListener(TryLockItem);
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if(_lastAssaultTime <= 0)
-        {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
-        }
-
-        _lastAssaultTime -= Time.deltaTime;  
+        _sellButton.onClick.RemoveListener(OnButtonClick);
+        _sellButton.onClick.RemoveListener(TryLockItem);
     }
 
-    private void Assault(Player target)
+    public void Render(Weapon weapon)
     {
-        _animator.Play("Assault");
+        _weapon = weapon;
 
-        target.ApplyDamage(_damage);
+        _label.text = weapon.Label;
+        _price.text = weapon.Price.ToString();
+        _icon.sprite = weapon.Icon;
+    }
+
+    private void TryLockItem()
+    {
+        if (_weapon.IsBuyed)
+            _sellButton.interactable = false;
+    }
+
+    private void OnButtonClick()
+    {
+        SellButtonClick?.Invoke(_weapon, this);
     }
 }
