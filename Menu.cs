@@ -1,35 +1,23 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class Menu : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
-
-    private float _lastAssaultTime;
-    private Animator _animator;
-
-    private void Start()
+    public void OpenPanel(GameObject panel)
     {
-        _animator = GetComponent<Animator>();
+        panel.SetActive(true);
+
+        Time.timeScale = 0;
     }
 
-    private void Update()
+    public void ClosePanel(GameObject panel)
     {
-        if(_lastAssaultTime <= 0)
-        {
-            Assault(Target);
+        panel.SetActive(false);
 
-            _lastAssaultTime = _delay;
-        }
-
-        _lastAssaultTime -= Time.deltaTime;  
+        Time.timeScale = 1;
     }
 
-    private void Assault(Player target)
+    public void Exit()
     {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
+        Application.Quit();
     }
 }
