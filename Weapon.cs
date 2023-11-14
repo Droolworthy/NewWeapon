@@ -1,35 +1,23 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public abstract class Weapon : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] private string _label;
+    [SerializeField] private int _price;
+    [SerializeField] private bool _isBuyed = false;
+    [SerializeField] private Sprite _icon;
+    [SerializeField] protected RevolverBullet RevolverBullet;
+    [SerializeField] protected ShotgunBullet ShotgunBullet;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
+    public string Label => _label;
+    public int Price => _price;
+    public bool IsBuyed => _isBuyed;
+    public Sprite Icon => _icon;
 
-    private void Start()
+    public abstract void Shoot(Transform shootPoint);
+
+    public void Buy()
     {
-        _animator = GetComponent<Animator>();
-    }
-
-    private void Update()
-    {
-        if(_lastAssaultTime <= 0)
-        {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
-        }
-
-        _lastAssaultTime -= Time.deltaTime;  
-    }
-
-    private void Assault(Player target)
-    {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
+        _isBuyed = true;
     }
 }
