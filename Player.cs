@@ -1,35 +1,84 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class Player : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] private int _health;
+    [SerializeField] private List<Weapon> _weapons;
+    [SerializeField] private Transform _shootPoint;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
+    private Weapon _currentWeapon;
+    private int _currentHealth;
+    private int _currentNumberWeapon = 0;
+
+    public int Money { get; private set; }
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
+        _currentHealth = _health;
+        _currentWeapon = _weapons[_currentNumberWeapon];
     }
 
     private void Update()
     {
-        if(_lastAssaultTime <= 0)
+        int button = 1;
+
+        if (Input.GetMouseButtonDown(button))
         {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
+            _currentWeapon.Shoot(_shootPoint);
         }
-
-        _lastAssaultTime -= Time.deltaTime;  
     }
 
-    private void Assault(Player target)
+    public void ApplyDamage(int damage)
     {
-        _animator.Play("Assault");
+        _currentHealth -= damage;
 
-        target.ApplyDamage(_damage);
+        if(_currentHealth <= 0)
+            Destroy(gameObject);
+    }
+
+    public void AddMoney(int money)
+    {
+        Money += money;
+    }
+
+    public void BuyWeapon(Weapon weapon)
+    {
+        Money -= weapon.Price;
+
+        _weapons.Add(weapon);
+    }
+
+    public void NextWeapon()
+    {
+        _currentWeapon.gameObject.SetActive(false);
+
+        if (_currentNumberWeapon == _weapons.Count - 1)
+            _currentNumberWeapon = 0;
+        else
+            _currentNumberWeapon++;
+
+        ChangeWeapon(_weapons[_currentNumberWeapon]);
+
+        _currentWeapon.gameObject.SetActive(true);
+    }
+
+    public void PreviousWeapon()
+    {
+        _currentWeapon.gameObject.SetActive(false);
+
+        if (_currentNumberWeapon == 0)
+            _currentNumberWeapon = _weapons.Count - 1;
+        else
+            _currentNumberWeapon--;
+
+        ChangeWeapon(_weapons[_currentNumberWeapon]);
+
+        _currentWeapon.gameObject.SetActive(true);
+    }
+
+    private void ChangeWeapon(Weapon weapon)
+    {
+        _currentWeapon = weapon;
     }
 }
