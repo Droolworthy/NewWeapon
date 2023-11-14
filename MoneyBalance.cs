@@ -1,35 +1,13 @@
+using TMPro;
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class MoneyBalance : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] private TMP_Text _money;
+    [SerializeField] private Player _player;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
-
-    private void Start()
+    private void OnEnable()
     {
-        _animator = GetComponent<Animator>();
-    }
-
-    private void Update()
-    {
-        if(_lastAssaultTime <= 0)
-        {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
-        }
-
-        _lastAssaultTime -= Time.deltaTime;  
-    }
-
-    private void Assault(Player target)
-    {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
+        _money.text = _player.Money.ToString();
     }
 }
