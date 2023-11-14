@@ -1,23 +1,44 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Menu : MonoBehaviour
+public class Shop : MonoBehaviour
 {
-    public void OpenPanel(GameObject panel)
-    {
-        panel.SetActive(true);
+    [SerializeField] private List<Weapon> _weapons;
+    [SerializeField] private Player _player;
+    [SerializeField] private WeaponView _template;
+    [SerializeField] private Content _itemContainer;
 
-        Time.timeScale = 0;
+    private void Start()
+    {
+        for (int i = 0; i < _weapons.Count; i++)
+        {
+            AddItem(_weapons[i]);
+        }
     }
 
-    public void ClosePanel(GameObject panel)
+    private void AddItem(Weapon weapon)
     {
-        panel.SetActive(false);
+        var view = Instantiate(_template, _itemContainer.transform);
 
-        Time.timeScale = 1;
+        view.SellButtonClick += OnSellButtonClick;
+
+        view.Render(weapon);
     }
 
-    public void Exit()
+    private void OnSellButtonClick(Weapon weapon, WeaponView view)
     {
-        Application.Quit();
+        TrySellWeapon(weapon, view);
+    }
+
+    private void TrySellWeapon(Weapon weapon, WeaponView view)
+    {
+        if (weapon.Price <= _player.Money)
+        {
+            _player.BuyWeapon(weapon);
+
+            weapon.Buy();
+
+            view.SellButtonClick -= OnSellButtonClick;
+        }
     }
 }
